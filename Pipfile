@@ -12,6 +12,8 @@ django-allauth = "*"
 django-storages = "*"
 django-ckeditor = "*"
 psycopg2-binary = "*"
+pillow = "*"
+django-filter = "*"
 
 [dev-packages]
 

@@ -11,32 +11,48 @@ https://docs.djangoproject.com/en/3.1/ref/settings/
 """
 
 from pathlib import Path
+import environ
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+env = environ.Env(
+    ENV=(str, 'DEV')
+)
+environ.Env.read_env(env_file='{0}/.env'.format(BASE_DIR))
 
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = '$2-p$e_cm4#mpmi)@i4mwtk+%n#je!*89_990sn3wdqz+oy5l5'
+SECRET_KEY = env('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
-
-ALLOWED_HOSTS = []
+ENV = env('ENV')
 
 
 # Application definition
 
 INSTALLED_APPS = [
+    'api',
+
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.sites',
+
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+    'allauth.socialaccount.providers.auth0',
+    'rest_framework',
+    'imagekit',
+    'ckeditor',
+    'django_filters',
 ]
 
 MIDDLEWARE = [
@@ -74,10 +90,7 @@ WSGI_APPLICATION = 'core.wsgi.application'
 # https://docs.djangoproject.com/en/3.1/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
+    'default': env.db()
 }
 
 
@@ -99,6 +112,16 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+AUTHENTICATION_BACKENDS = [
+    # Needed to login by username in Django admin, regardless of `allauth`
+    'django.contrib.auth.backends.ModelBackend',
+
+    # `allauth` specific authentication methods, such as login by e-mail
+    'allauth.account.auth_backends.AuthenticationBackend',
+]
+
+AUTH_USER_MODEL = 'api.User'
+
 
 # Internationalization
 # https://docs.djangoproject.com/en/3.1/topics/i18n/
@@ -118,3 +141,28 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.1/howto/static-files/
 
 STATIC_URL = '/static/'
+STATIC_ROOT = '{0}/static'.format(BASE_DIR)
+
+MEDIA_ROOT = '{0}/media'.format(BASE_DIR)
+MEDIA_URL = '/media/'
+
+SIDE_ID = 1
+
+SOCIALACCOUNT_PROVIDERS = {
+    'auth0': {
+        'AUTH0_URL': 'https://moe-ph.au.auth0.com',
+    }
+}
+
+IMAGEKIT_DEFAULT_CACHEFILE_STRATEGY = 'imagekit.cachefiles.strategies.Optimistic'
+
+REST_FRAMEWORK = {
+    'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend']
+}
+
+if ENV == 'DEV':
+    DEBUG = True
+    ALLOWED_HOSTS = ['example.com']
+elif ENV == 'PROD':
+    DEBUG = False
+    ALLOWED_HOSTS = []
