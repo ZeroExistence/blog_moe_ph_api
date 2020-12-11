@@ -146,7 +146,7 @@ STATIC_ROOT = '{0}/static'.format(BASE_DIR)
 MEDIA_ROOT = '{0}/media'.format(BASE_DIR)
 MEDIA_URL = '/media/'
 
-SIDE_ID = 1
+SITE_ID = 1
 
 SOCIALACCOUNT_PROVIDERS = {
     'auth0': {

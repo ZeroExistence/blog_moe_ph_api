@@ -18,8 +18,12 @@ from django.urls import path, include
 from django.conf import settings
 
 from rest_framework import routers
+from api.views import PostViewSet, TaggedPostViewSet
 
 router = routers.DefaultRouter()
+router.register(r'tag', TaggedPostViewSet)
+router.register(r'post', PostViewSet)
+router.register(r'', PostViewSet)
 
 urlpatterns = [
     path('api/v1/', include(router.urls)),
