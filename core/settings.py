@@ -17,7 +17,9 @@ import environ
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 env = environ.Env(
-    ENV=(str, 'DEV')
+    ENV=(str, 'DEV'),
+    SITE_ID=(int, 1),
+    REMOTE_STORAGE=(bool, False)
 )
 environ.Env.read_env(env_file='{0}/.env'.format(BASE_DIR))
 
@@ -138,23 +140,15 @@ USE_L10N = True
 
 USE_TZ = True
 
-
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/3.1/howto/static-files/
-
-STATIC_URL = '/static/'
-STATIC_ROOT = '{0}/static'.format(BASE_DIR)
-
-MEDIA_ROOT = '{0}/media'.format(BASE_DIR)
-MEDIA_URL = '/media/'
-
-SITE_ID = 1
+SITE_ID = env('SITE_ID')
 
 SOCIALACCOUNT_PROVIDERS = {
     'auth0': {
         'AUTH0_URL': 'https://moe-ph.au.auth0.com',
     }
 }
+
+LOGIN_REDIRECT_URL = '/admin/'
 
 IMAGEKIT_DEFAULT_CACHEFILE_STRATEGY = 'imagekit.cachefiles.strategies.Optimistic'
 
@@ -170,6 +164,36 @@ if ENV == 'DEV':
         "http://192.168.39.1:3000",
         "http://example.com:3000"
     ]
+    if env('REMOTE_STORAGE'):
+        DEFAULT_FILE_STORAGE = 'api.custom_class.MediaStorage'
+        STATICFILES_STORAGE = 'api.custom_class.MediaStorage'
+        AWS_S3_ENDPOINT_URL = 'https://us-east-1.linodeobjects.com'
+        AWS_S3_REGION_NAME = 'US'
+        AWS_DEFAULT_ACL = 'public-read'
+        AWS_QUERYSTRING_AUTH = False
+
+        AWS_ACCESS_KEY_ID = env('AWS_ACCESS_KEY_ID')
+        AWS_SECRET_ACCESS_KEY = env('AWS_SECRET_ACCESS_KEY')
+        AWS_STORAGE_BUCKET_NAME = env('AWS_STORAGE_BUCKET_NAME')
+        AWS_S3_CUSTOM_DOMAIN = env('AWS_S3_CUSTOM_DOMAIN')
+    else:
+        STATIC_URL = '/static/'
+        STATIC_ROOT = '{0}/static'.format(BASE_DIR)
+
+        MEDIA_ROOT = '{0}/media'.format(BASE_DIR)
+        MEDIA_URL = '/media/'
+
 elif ENV == 'PROD':
     DEBUG = False
     ALLOWED_HOSTS = []
+    DEFAULT_FILE_STORAGE = 'api.custom_class.MediaStorage'
+    STATICFILES_STORAGE = 'api.custom_class.MediaStorage'
+    AWS_S3_ENDPOINT_URL = 'https://us-east-1.linodeobjects.com'
+    AWS_S3_REGION_NAME = 'US'
+    AWS_DEFAULT_ACL = 'public-read'
+    AWS_QUERYSTRING_AUTH = False
+
+    AWS_ACCESS_KEY_ID = env('AWS_ACCESS_KEY_ID')
+    AWS_SECRET_ACCESS_KEY = env('AWS_SECRET_ACCESS_KEY')
+    AWS_STORAGE_BUCKET_NAME = env('AWS_STORAGE_BUCKET_NAME')
+    AWS_S3_CUSTOM_DOMAIN = env('AWS_S3_CUSTOM_DOMAIN')
