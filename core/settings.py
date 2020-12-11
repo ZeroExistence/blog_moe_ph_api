@@ -53,11 +53,13 @@ INSTALLED_APPS = [
     'imagekit',
     'ckeditor',
     'django_filters',
+    'corsheaders',
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -162,7 +164,12 @@ REST_FRAMEWORK = {
 
 if ENV == 'DEV':
     DEBUG = True
-    ALLOWED_HOSTS = ['example.com']
+    ALLOWED_HOSTS = ['example.com', '192.168.39.1']
+    CORS_ALLOWED_ORIGINS = [
+        "http://localhost:3000",
+        "http://192.168.39.1:3000",
+        "http://example.com:3000"
+    ]
 elif ENV == 'PROD':
     DEBUG = False
     ALLOWED_HOSTS = []
