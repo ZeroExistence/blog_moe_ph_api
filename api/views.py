@@ -1,12 +1,13 @@
 from rest_framework import viewsets, pagination
 from rest_framework.response import Response
 from collections import OrderedDict
-from django.shortcuts import get_list_or_404, get_object_or_404
-from rest_framework.decorators import api_view
+from django.shortcuts import get_list_or_404
+from django.core.paginator import Paginator, EmptyPage
 from .models import Post, Tag
 from .serializers import PostSerializer, TagSerializer
 
 # Create your views here.
+
 
 class PostPagination(pagination.PageNumberPagination):
     page_size = 12
@@ -38,5 +39,27 @@ class TaggedPostViewSet(viewsets.ReadOnlyModelViewSet):
     def retrieve(self, request, slug=None):
         queryset = Post.on_site.all()
         posts = get_list_or_404(queryset, tag__slug=slug)
-        serializer = PostSerializer(posts, many=True)
-        return Response(serializer.data)
+        try:
+            paginator = Paginator(posts, 12, allow_empty_first_page=False)
+            page_number = int(request.GET.get('page', 1))
+            page_obj = paginator.page(page_number)
+            if page_obj.has_next():
+                next_page_number = page_obj.next_page_number()
+            else:
+                next_page_number = None
+            if page_obj.has_previous():
+                previous_page_number = page_obj.previous_page_number()
+            else:
+                previous_page_number = None
+            serializer = PostSerializer(page_obj, many=True)
+            return Response(OrderedDict([
+                ('current', page_number),
+                ('next', next_page_number),
+                ('previous', previous_page_number),
+                ('last_page', paginator.num_pages),
+                ('results', serializer.data),
+            ]))
+        except (EmptyPage, ValueError):
+            return Response({
+                "detail": "Invalid page."
+            })
