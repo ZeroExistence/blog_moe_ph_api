@@ -4,6 +4,8 @@ from ckeditor.fields import RichTextField
 from django.contrib.auth.models import AbstractUser
 from django.contrib.sites.models import Site
 from django.contrib.sites.managers import CurrentSiteManager
+from imagekit.models import ImageSpecField
+from imagekit.processors import ResizeToFit
 
 
 class User(AbstractUser):
@@ -13,7 +15,7 @@ class User(AbstractUser):
 # Create your models here.
 
 def upload_media(instance, filename):
-    return '{0}/{1}'.format(instance.id, filename)
+    return '{0}/{1}'.format(instance.pk, filename)
 
 
 class Tag(models.Model):
@@ -41,7 +43,13 @@ class Tag(models.Model):
 
 
 class Image(models.Model):
-    original = models.ImageField(upload_to=upload_media)
+    original = models.ImageField()
+    image = ImageSpecField(
+        source='original',
+        processors=[ResizeToFit(1024, 1024, upscale=False)],
+        format='JPEG',
+        options={'quality': 85}
+    )
     caption = models.CharField(
         max_length=100,
         null=True,

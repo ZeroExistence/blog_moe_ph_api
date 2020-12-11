@@ -10,11 +10,11 @@ class TagSerializer(serializers.ModelSerializer):
 
 class PostSerializer(serializers.ModelSerializer):
     class ImageSerializer(serializers.ModelSerializer):
-        original = serializers.ImageField(read_only=True)
+        image = serializers.ImageField(read_only=True)
 
         class Meta:
             model = Image
-            fields = ['original', 'caption']
+            fields = ['image', 'caption']
 
     image = ImageSerializer()
     tag = TagSerializer(many=True)
