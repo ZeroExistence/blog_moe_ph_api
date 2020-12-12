@@ -4,7 +4,7 @@ LABEL maintainer="admin@moe.ph"
 
 # Set environment varibles
 ENV PYTHONUNBUFFERED 1
-ENV ENV prod
+ENV ENV PROD
 
 RUN apt-get update && apt-get install -y --no-install-recommends -y gcc zlib1g-dev libjpeg-dev libjpeg62-turbo libpq-dev postgresql-common libev-dev && pip3 install wheel;
 

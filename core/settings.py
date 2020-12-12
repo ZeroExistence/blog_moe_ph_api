@@ -23,8 +23,6 @@ env = environ.Env(
     ALLOWED_HOSTS=(list),
     CORS_ALLOWED_ORIGINS=(list)
 )
-environ.Env.read_env(env_file='{0}/.env'.format(BASE_DIR))
-
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.1/howto/deployment/checklist/
@@ -165,7 +163,7 @@ ALLOWED_HOSTS = env('ALLOWED_HOSTS')
 if ENV == 'DEV':
     DEBUG = True
     CORS_ALLOWED_ORIGINS = env('CORS_ALLOWED_ORIGINS')
-    
+
     if env('REMOTE_STORAGE'):
         DEFAULT_FILE_STORAGE = 'api.custom_class.MediaStorage'
         STATICFILES_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
