@@ -19,7 +19,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 env = environ.Env(
     ENV=(str, 'DEV'),
     SITE_ID=(int, 1),
-    REMOTE_STORAGE=(bool, False)
+    REMOTE_STORAGE=(bool, False),
+    ALLOWED_HOSTS=(list),
+    CORS_ALLOWED_ORIGINS=(list)
 )
 environ.Env.read_env(env_file='{0}/.env'.format(BASE_DIR))
 
@@ -126,6 +128,8 @@ AUTHENTICATION_BACKENDS = [
 
 AUTH_USER_MODEL = 'api.User'
 
+STATIC_URL = '/static/'
+MEDIA_URL = '/media/'
 
 # Internationalization
 # https://docs.djangoproject.com/en/3.1/topics/i18n/
@@ -156,17 +160,15 @@ REST_FRAMEWORK = {
     'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend']
 }
 
+ALLOWED_HOSTS = env('ALLOWED_HOSTS')
+
 if ENV == 'DEV':
     DEBUG = True
-    ALLOWED_HOSTS = ['example.com', '192.168.39.1']
-    CORS_ALLOWED_ORIGINS = [
-        "http://localhost:3000",
-        "http://192.168.39.1:3000",
-        "http://example.com:3000"
-    ]
+    CORS_ALLOWED_ORIGINS = env('CORS_ALLOWED_ORIGINS')
+    
     if env('REMOTE_STORAGE'):
         DEFAULT_FILE_STORAGE = 'api.custom_class.MediaStorage'
-        STATICFILES_STORAGE = 'api.custom_class.MediaStorage'
+        STATICFILES_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
         AWS_S3_ENDPOINT_URL = 'https://us-east-1.linodeobjects.com'
         AWS_S3_REGION_NAME = 'US'
         AWS_DEFAULT_ACL = 'public-read'
@@ -177,15 +179,33 @@ if ENV == 'DEV':
         AWS_STORAGE_BUCKET_NAME = env('AWS_STORAGE_BUCKET_NAME')
         AWS_S3_CUSTOM_DOMAIN = env('AWS_S3_CUSTOM_DOMAIN')
     else:
-        STATIC_URL = '/static/'
         STATIC_ROOT = '{0}/static'.format(BASE_DIR)
-
         MEDIA_ROOT = '{0}/media'.format(BASE_DIR)
-        MEDIA_URL = '/media/'
 
 elif ENV == 'PROD':
     DEBUG = False
-    ALLOWED_HOSTS = []
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+    LOGGING = {
+        'version': 1,
+        'disable_existing_loggers': False,
+        'handlers': {
+            'console': {
+                'level': 'INFO',
+                'class': 'logging.StreamHandler',
+                'stream'  : 'ext://sys.stdout',
+            },
+        },
+        'loggers': {
+            'django': {
+                'handlers': ['console'],
+                'level': 'INFO',
+                'propagate': True,
+            },
+        },
+    }
+
     DEFAULT_FILE_STORAGE = 'api.custom_class.MediaStorage'
     STATICFILES_STORAGE = 'api.custom_class.MediaStorage'
     AWS_S3_ENDPOINT_URL = 'https://us-east-1.linodeobjects.com'
