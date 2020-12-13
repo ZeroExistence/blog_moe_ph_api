@@ -3,7 +3,7 @@ http:
     blog-api-secure:
       entryPoints:
       - "web-fe-secure"
-      rule: "Host(`blog.moe.ph`) && (PathPrefix(`/api/v1/`)"
+      rule: "(Host(`tech.moe.ph`)) && (PathPrefix(`/api/v1/`))"
       priority: 2
       service: "blog-api-be"
       middlewares:
@@ -20,5 +20,5 @@ http:
     blog-api-be:
       loadBalancer:
         servers:
-        - url: "http://api.blog.moe.ph.local:8000/"
+        - url: "http://blog.api.moe.ph.local:8000/"
         passHostHeader: true
