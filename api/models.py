@@ -31,6 +31,9 @@ class Tag(models.Model):
     objects = models.Manager()
     on_site = CurrentSiteManager()
 
+    def in_sites(self):
+        return ', '.join([sites.domain for sites in self.sites.all()])
+
     def __str__(self):
         return self.name
 
@@ -55,6 +58,9 @@ class Image(models.Model):
         null=True,
         blank=True
     )
+
+    def __str__(self):
+        return self.original.name
 
 
 class Post(models.Model):
@@ -84,6 +90,9 @@ class Post(models.Model):
     objects = models.Manager()
     on_site = CurrentSiteManager()
 
+    def in_sites(self):
+        return ', '.join([sites.domain for sites in self.sites.all()])
+
     def __str__(self):
         return self.title
 
@@ -92,4 +101,4 @@ class Post(models.Model):
         super().save(*args, **kwargs)
 
     class Meta:
-        ordering = ['date', 'title']
+        ordering = ['-date', 'title']
