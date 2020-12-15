@@ -160,6 +160,20 @@ REST_FRAMEWORK = {
 
 ALLOWED_HOSTS = env('ALLOWED_HOSTS')
 
+CKEDITOR_CONFIGS = {
+    'default': {
+        'toolbar': 'Custom',
+        'toolbar_Custom': [
+            ['Styles', 'Format'],
+            ['Bold', 'Italic', 'Underline'],
+            ['NumberedList', 'BulletedList', '-', 'Outdent', 'Indent', 'Blockquote', '-', 'JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock'],
+            ['Link', 'Unlink'],
+            ['HorizontalRule', 'Image'],
+            ['RemoveFormat', 'Source']
+        ]
+    }
+}
+
 if ENV == 'DEV':
     DEBUG = True
     CORS_ALLOWED_ORIGINS = env('CORS_ALLOWED_ORIGINS')
