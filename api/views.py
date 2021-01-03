@@ -63,13 +63,7 @@ class TaggedPostViewSet(viewsets.ReadOnlyModelViewSet):
                 ('results', serializer.data),
             ]))
         except (EmptyPage, ValueError):
-<<<<<<< HEAD
             return Response(
                 data={"detail": "Invalid page."},
                 status=404
                 )
-=======
-            return Response({
-                "detail": "Invalid page."
-            })
->>>>>>> fee1fe81d49ca33998afb4b476adec9cdfe0281a
