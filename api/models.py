@@ -51,7 +51,7 @@ class Image(models.Model):
         source='original',
         processors=[ResizeToFit(1024, 1024, upscale=False)],
         format='JPEG',
-        options={'quality': 85}
+        options={'quality': 85, 'progressive': True}
     )
     caption = models.CharField(
         max_length=100,
