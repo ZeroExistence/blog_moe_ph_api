@@ -1,4 +1,4 @@
-from rest_framework import viewsets
+from rest_framework import viewsets, pagination
 from rest_framework.response import Response
 from collections import OrderedDict
 from django.shortcuts import get_list_or_404
@@ -32,6 +32,7 @@ class PostViewSet(viewsets.ReadOnlyModelViewSet):
     lookup_field = 'slug'
     queryset = Post.on_site.all()
     serializer_class = PostSerializer
+    pagination_class = PostPagination
 
 
 class TaggedPostViewSet(viewsets.ReadOnlyModelViewSet):
