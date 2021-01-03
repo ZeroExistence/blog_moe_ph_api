@@ -15,10 +15,14 @@ class PostPagination(pagination.PageNumberPagination):
     max_page_size = 24
 
     def get_paginated_response(self, data):
+        next_page_number = self.page.next_page_number() \
+            if self.page.has_next() else None
+        previous_page_number = self.page.previous_page_number() \
+            if self.page.has_previous() else None
         return Response(OrderedDict([
             ('current', self.page.number),
-            ('next', self.get_next_link()),
-            ('previous', self.get_previous_link()),
+            ('next', next_page_number),
+            ('previous', previous_page_number),
             ('last_page', self.page.paginator.num_pages),
             ('results', data)
         ]))
@@ -59,6 +63,7 @@ class TaggedPostViewSet(viewsets.ReadOnlyModelViewSet):
                 ('results', serializer.data),
             ]))
         except (EmptyPage, ValueError):
-            return Response({
-                "detail": "Invalid page."
-            })
+            return Response(
+                data={"detail": "Invalid page."},
+                status=404
+                )
